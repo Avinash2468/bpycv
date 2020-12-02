@@ -9,9 +9,12 @@ Created on Sat Dec 28 21:33:28 2019
 from boxx import *
 from boxx import os, withattr, imread
 
+import cv2
 import bpy
 import tempfile
 from collections import OrderedDict
+import time
+import matplotlib.pyplot as plt
 
 from .statu_recover import StatuRecover, undo
 from .exr_image_parser import parser_exr, ImageWithAnnotation
@@ -86,6 +89,9 @@ def render_image():
         bpy.ops.render.render(write_still=True)
     image = imread(png_path)[..., :3]
     os.remove(png_path)
+    print(png_path)
+    plt.imshow(image)
+    plt.show()
     return image
 
 
@@ -94,17 +100,27 @@ befor_render_data_hooks = OrderedDict()
 
 # @undo()
 def render_data(render_image=True, render_annotation=True):
+    t0 = time.time()
     scene = bpy.data.scenes[0]
+    print(bpy.data.scenes.keys)
     render = scene.render
+    print(time.time() - t0) #1
+    t0 = time.time()
+    # render = scene
     for hook_name, hook in befor_render_data_hooks.items():
         print(f"Run befor_render_data_hooks[{hook_name}]")
         hook()
+    print(time.time() - t0) #2
+    t0 = time.time()
     befor_render_data_hooks.clear()
-
+    print(time.time() - t0) #3
+    t0 = time.time()
     path = tempfile.NamedTemporaryFile().name
     render_result = {}
-    if render_image:
-        render_result["image"] = _render_image()
+    # if render_image:
+    #     render_result["image"] = _render_image()
+    print(time.time() - t0) #4
+    t0 = time.time()
     if render_annotation:
         exr_path = path + ".exr"
         with set_inst_material(), set_annotation_render(), withattr(
@@ -115,10 +131,14 @@ def render_data(render_image=True, render_annotation=True):
         render_result["exr"] = parser_exr(exr_path)
         os.remove(exr_path)
     result = ImageWithAnnotation(**render_result)
-    if "render_6d_pose" and render_annotation:
-        objs = [obj for obj in bpy.data.objects if "inst_id" in obj]
-        ycb_6d_pose = get_6d_pose(objs, inst=result["inst"])
-        result["ycb_6d_pose"] = ycb_6d_pose
+    print(time.time() - t0) #5
+    # t0 = time.time()
+    # if "render_6d_pose" and render_annotation:
+    #     objs = [obj for obj in bpy.data.objects if "inst_id" in obj]
+    #     ycb_6d_pose = get_6d_pose(objs, inst=result["inst"])
+    #     result["ycb_6d_pose"] = ycb_6d_pose
+    # print(time.time() - t0) #6
+    # t0 = time.time()
     return result
 
 

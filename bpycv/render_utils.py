@@ -129,6 +129,7 @@ def render_data(render_image=True, render_annotation=True):
             print("Render annotation using:", render.engine)
             bpy.ops.render.render(write_still=True)
         render_result["exr"] = parser_exr(exr_path)
+        print(exr_path)
         os.remove(exr_path)
     result = ImageWithAnnotation(**render_result)
     print(time.time() - t0) #5

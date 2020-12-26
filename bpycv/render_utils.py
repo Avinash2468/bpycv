@@ -90,8 +90,6 @@ def render_image():
     image = imread(png_path)[..., :3]
     os.remove(png_path)
     print(png_path)
-    plt.imshow(image)
-    plt.show()
     return image
 
 
@@ -117,8 +115,8 @@ def render_data(render_image=True, render_annotation=True):
     t0 = time.time()
     path = tempfile.NamedTemporaryFile().name
     render_result = {}
-    # if render_image:
-    #     render_result["image"] = _render_image()
+    if render_image:
+        render_result["image"] = _render_image()
     print(time.time() - t0) #4
     t0 = time.time()
     if render_annotation:

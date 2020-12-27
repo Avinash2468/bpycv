@@ -63,7 +63,7 @@ class ImageWithAnnotation(dict):
         super().__init__(**kv)
         self["image"] = image
         self["inst"] = exr.get_inst()
-        print(exr)
+        # print(exr)
         self["depth"] = exr.get_depth()
         self["_raw_exr"] = exr
 
